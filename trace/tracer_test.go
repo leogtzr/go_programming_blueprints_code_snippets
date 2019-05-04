@@ -17,3 +17,11 @@ func TestNew(t *testing.T) {
 		}
 	}
 }
+
+func TestOff(t *testing.T) {
+	silentTracer := Off()
+	if silentTracer == nil {
+		t.Error("Return from New should not be nil")
+	}
+	silentTracer.Trace("something")
+}
