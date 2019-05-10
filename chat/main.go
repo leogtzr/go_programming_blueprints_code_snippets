@@ -31,6 +31,17 @@ func main() {
 	http.HandleFunc("/auth/", loginHandler)
 	http.Handle("/room", r)
 
+	http.HandleFunc("/logout", func(rw http.ResponseWriter, r *http.Request) {
+		http.SetCookie(rw, &http.Cookie{
+			Name:   "auth",
+			Value:  "",
+			Path:   "/",
+			MaxAge: -1,
+		})
+		rw.Header().Set("Location", "/chat")
+		rw.WriteHeader(http.StatusTemporaryRedirect)
+	})
+
 	// get the room going
 	go r.run()
 
