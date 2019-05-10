@@ -3,7 +3,6 @@ package main
 import (
 	"crypto/md5"
 	"errors"
-	"fmt"
 	"io"
 	"strings"
 )
@@ -33,18 +32,17 @@ type GravatarAvatar struct{}
 var UseGravatar GravatarAvatar
 
 func (GravatarAvatar) GetAvatarURL(c *client) (string, error) {
-	email, ok := c.userData["email"]
+	userID, ok := c.userData["userid"]
 	if !ok {
 		return "", ErrNoAvatar
 	}
-	emailStr, ok := email.(string)
+	userIDStr, ok := userID.(string)
 	if !ok {
 		return "", ErrNoAvatar
 	}
-	// return emailStr, nil
 	m := md5.New()
-	io.WriteString(m, strings.ToLower(emailStr))
-	return fmt.Sprintf("//www.gravatar.com/avatar/%x", m.Sum(nil)), nil
+	io.WriteString(m, strings.ToLower(userIDStr))
+	return "//www.gravatar.com/avatar/" + userIDStr, nil
 }
 
 // GetAvatarURL ...

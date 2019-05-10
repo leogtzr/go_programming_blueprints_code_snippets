@@ -23,13 +23,15 @@ func main() {
 		//google.New("key", "secret", "http://localhost:8080/auth/callback/google"),
 	)
 
-	r := newRoom(UseAuthAvatar)
+	r := newRoom(UseGravatar)
 	r.tracer = trace.New(os.Stdout)
 
 	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
 	http.Handle("/login", &templateHandler{filename: "login.html"})
 	http.HandleFunc("/auth/", loginHandler)
 	http.Handle("/room", r)
+	http.Handle("/upload", &templateHandler{filename: "upload.html"})
+	http.HandleFunc("/uploader", uploadHandler)
 
 	http.HandleFunc("/logout", func(rw http.ResponseWriter, r *http.Request) {
 		http.SetCookie(rw, &http.Cookie{
