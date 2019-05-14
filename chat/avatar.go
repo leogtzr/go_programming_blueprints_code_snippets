@@ -4,6 +4,8 @@ import (
 	"crypto/md5"
 	"errors"
 	"io"
+	"io/ioutil"
+	"path"
 	"strings"
 )
 
@@ -68,9 +70,26 @@ var UseFileSystemAvatar FileSystemAvatar
 
 // GetAvatarURL ...
 func (FileSystemAvatar) GetAvatarURL(c *client) (string, error) {
+	// if userid, ok := c.userData["userid"]; ok {
+	// 	if useridStr, ok := userid.(string); ok {
+	// 		return "/avatars/" + useridStr + ".jpg", nil
+	// 	}
+	// }
+	// return "", ErrNoAvatar
 	if userid, ok := c.userData["userid"]; ok {
 		if useridStr, ok := userid.(string); ok {
-			return "/avatars/" + useridStr + ".jpg", nil
+			files, err := ioutil.ReadDir("avatars")
+			if err != nil {
+				return "", ErrNoAvatar
+			}
+			for _, file := range files {
+				if file.IsDir() {
+					continue
+				}
+				if match, _ := path.Match(useridStr+"*", file.Name()); match {
+					return "/avatars/" + file.Name(), nil
+				}
+			}
 		}
 	}
 	return "", ErrNoAvatar
