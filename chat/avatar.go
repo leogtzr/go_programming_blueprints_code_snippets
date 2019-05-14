@@ -57,3 +57,19 @@ func (AuthAvatar) GetAvatarURL(c *client) (string, error) {
 	}
 	return urlStr, nil
 }
+
+// FileSystemAvatar ...
+type FileSystemAvatar struct{}
+
+// UseFileSystemAvatar ...
+var UseFileSystemAvatar FileSystemAvatar
+
+// GetAvatarURL ...
+func (FileSystemAvatar) GetAvatarURL(c *client) (string, error) {
+	if userid, ok := c.userData["userid"]; ok {
+		if useridStr, ok := userid.(string); ok {
+			return "/avatars/" + useridStr + ".jpg", nil
+		}
+	}
+	return "", ErrNoAvatar
+}

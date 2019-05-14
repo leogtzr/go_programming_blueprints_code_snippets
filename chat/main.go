@@ -32,6 +32,11 @@ func main() {
 	http.Handle("/room", r)
 	http.Handle("/upload", &templateHandler{filename: "upload.html"})
 	http.HandleFunc("/uploader", uploadHandler)
+	http.Handle("/avatars/",
+		http.StripPrefix("/avatars/",
+			http.FileServer(http.Dir("./avatars")),
+		),
+	)
 
 	http.HandleFunc("/logout", func(rw http.ResponseWriter, r *http.Request) {
 		http.SetCookie(rw, &http.Cookie{
