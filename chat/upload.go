@@ -26,5 +26,4 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	io.WriteString(w, "Successful")
-
 }

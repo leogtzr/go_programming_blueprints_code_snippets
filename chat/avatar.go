@@ -29,8 +29,10 @@ var UseAuthAvatar AuthAvatar
 // GravatarAvatar
 type GravatarAvatar struct{}
 
+// UseGravatar ...
 var UseGravatar GravatarAvatar
 
+// GetAvatarURL ...
 func (GravatarAvatar) GetAvatarURL(c *client) (string, error) {
 	userID, ok := c.userData["userid"]
 	if !ok {
