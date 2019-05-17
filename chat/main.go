@@ -11,6 +11,9 @@ import (
 	"github.com/stretchr/gomniauth/providers/github"
 )
 
+// set the active Avatar implementation
+var avatars Avatar = UseFileSystemAvatar
+
 func main() {
 
 	var addr = flag.String("addr", ":8080", "The addr of the application")
@@ -24,7 +27,7 @@ func main() {
 	)
 
 	// r := newRoom(UseGravatar)
-	r := newRoom(UseFileSystemAvatar)
+	r := newRoom()
 	r.tracer = trace.New(os.Stdout)
 
 	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))

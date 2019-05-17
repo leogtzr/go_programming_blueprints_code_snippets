@@ -1,12 +1,9 @@
 package main
 
 import (
-	"crypto/md5"
 	"errors"
-	"io"
 	"io/ioutil"
 	"path"
-	"strings"
 )
 
 // ErrNoAvatar is the error that is returned when the
@@ -19,7 +16,7 @@ type Avatar interface {
 	// or returns an error if something goes wrong.
 	// ErrNoAvatarURL is returned if the object is unable to get
 	// a URL for the specified client.
-	GetAvatarURL(c *client) (string, error)
+	GetAvatarURL(ChatUser) (string, error)
 }
 
 // AuthAvatar ...
@@ -35,31 +32,17 @@ type GravatarAvatar struct{}
 var UseGravatar GravatarAvatar
 
 // GetAvatarURL ...
-func (GravatarAvatar) GetAvatarURL(c *client) (string, error) {
-	userID, ok := c.userData["userid"]
-	if !ok {
-		return "", ErrNoAvatar
-	}
-	userIDStr, ok := userID.(string)
-	if !ok {
-		return "", ErrNoAvatar
-	}
-	m := md5.New()
-	io.WriteString(m, strings.ToLower(userIDStr))
-	return "//www.gravatar.com/avatar/" + userIDStr, nil
+func (GravatarAvatar) GetAvatarURL(u ChatUser) (string, error) {
+	return "//www.gravatar.com/avatar/" + u.UniqueID(), nil
 }
 
 // GetAvatarURL ...
-func (AuthAvatar) GetAvatarURL(c *client) (string, error) {
-	url, ok := c.userData["avatar_url"]
-	if !ok {
+func (AuthAvatar) GetAvatarURL(u ChatUser) (string, error) {
+	url := u.AvatarURL()
+	if len(url) == 0 {
 		return "", ErrNoAvatar
 	}
-	urlStr, ok := url.(string)
-	if !ok {
-		return "", ErrNoAvatar
-	}
-	return urlStr, nil
+	return url, nil
 }
 
 // FileSystemAvatar ...
@@ -69,28 +52,17 @@ type FileSystemAvatar struct{}
 var UseFileSystemAvatar FileSystemAvatar
 
 // GetAvatarURL ...
-func (FileSystemAvatar) GetAvatarURL(c *client) (string, error) {
-	// if userid, ok := c.userData["userid"]; ok {
-	// 	if useridStr, ok := userid.(string); ok {
-	// 		return "/avatars/" + useridStr + ".jpg", nil
-	// 	}
-	// }
-	// return "", ErrNoAvatar
-	if userid, ok := c.userData["userid"]; ok {
-		if useridStr, ok := userid.(string); ok {
-			files, err := ioutil.ReadDir("avatars")
-			if err != nil {
-				return "", ErrNoAvatar
+func (FileSystemAvatar) GetAvatarURL(u ChatUser) (string, error) {
+	if files, err := ioutil.ReadDir("avatars"); err == nil {
+		for _, file := range files {
+			if file.IsDir() {
+				continue
 			}
-			for _, file := range files {
-				if file.IsDir() {
-					continue
-				}
-				if match, _ := path.Match(useridStr+"*", file.Name()); match {
-					return "/avatars/" + file.Name(), nil
-				}
+			if match, _ := path.Match(u.UniqueID()+"*", file.Name()); match {
+				return "/avatars/" + file.Name(), nil
 			}
 		}
 	}
+
 	return "", ErrNoAvatar
 }

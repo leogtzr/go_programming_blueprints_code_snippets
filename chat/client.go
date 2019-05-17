@@ -29,7 +29,10 @@ func (c *client) read() {
 		}
 		msg.When = time.Now()
 		msg.Name = c.userData["name"].(string)
-		msg.AvatarURL, _ = c.room.avatar.GetAvatarURL(c)
+		// msg.AvatarURL, _ = c.room.avatar.GetAvatarURL()
+		if avatarUrl, ok := c.userData["avatar_url"]; ok {
+			msg.AvatarURL = avatarUrl.(string)
+		}
 		c.room.forward <- msg
 	}
 }
