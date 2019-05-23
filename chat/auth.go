@@ -128,7 +128,6 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		m := md5.New()
 		io.WriteString(m, strings.ToLower(user.Email()))
 		cu.uniqueID = fmt.Sprintf("%x", m.Sum(nil))
-		// userID := fmt.Sprintf("%x", m.Sum(nil))
 		avatarURL, err := avatars.GetAvatarURL(cu)
 		if err != nil {
 			log.Fatalln("Error when trying to GetAvatarURL", "-", err)

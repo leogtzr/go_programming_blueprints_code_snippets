@@ -22,14 +22,12 @@ func (c *client) read() {
 	defer c.socket.Close()
 	for {
 		var msg *message
-		// _, msg, err := c.socket.ReadMessage()
 		err := c.socket.ReadJSON(&msg)
 		if err != nil {
 			return
 		}
 		msg.When = time.Now()
 		msg.Name = c.userData["name"].(string)
-		// msg.AvatarURL, _ = c.room.avatar.GetAvatarURL()
 		if avatarUrl, ok := c.userData["avatar_url"]; ok {
 			msg.AvatarURL = avatarUrl.(string)
 		}
@@ -40,7 +38,6 @@ func (c *client) read() {
 func (c *client) write() {
 	defer c.socket.Close()
 	for msg := range c.send {
-		//err := c.socket.WriteMessage(websocket.TextMessage, msg)
 		err := c.socket.WriteJSON(msg)
 		if err != nil {
 			break
